@@ -43,3 +43,11 @@ app.get("/urls.json", (req, res) => {
     const templateVars = { greeting: "Hello World!" };
     res.render("hello_world", templateVars);
   });
+
+ app.get("/urls/:id", (req, res) => {
+    const id = req.params.id;
+    const longURL = urlDatabase[id]; // Retrieve longURL using the short URL ID
+    
+    const templateVars = { id, longURL };
+    res.render("urls_show", templateVars);
+  });
