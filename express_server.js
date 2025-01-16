@@ -3,7 +3,17 @@ const app = express();
 const PORT = 8080; // default port 8080
 const a = 1;
 
-function generateRandomString() {}
+function generateRandomString(length) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomString = '';
+  
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomString += characters[randomIndex];
+  }
+  
+  return randomString;
+}
 
 app.set("view engine", "ejs"); //in this server the html rendering engine is going ot be ejs
 //"view engine" is the html viewing engine
@@ -68,10 +78,17 @@ app.get("/urls.json", (req, res) => {
   });
 
   app.get("/u/:id", (req, res) => {
-    const longURL = (req.body)
-    res.redirect(longURL);
+    const { id } = req.params;
+    const longURL = urlDatabase[id]; // Assuming urlDatabase is your database object
+  
+    if (longURL) {
+      res.redirect(longURL);
+    } else {
+      res.status(404).send('Short URL not found!');
+    }
   });
 
+ 
 //all the api 
   //.get(only for display)
   //.post(to create or update)
