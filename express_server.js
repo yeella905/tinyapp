@@ -98,6 +98,14 @@ app.get("/urls.json", (req, res) => {
     delete urlDatabase[id]; // Assuming urlDatabase is your database object
     res.redirect('/urls');
   });
+
+  app.post('/urls/:id', (req, res) => {
+    const shortURL = req.params.id;
+    const newLongURL = req.body.longURL; // Ensure 'longURL' matches the form input's name attribute
+    urlDatabase[shortURL] = newLongURL; // Assuming 'urlDatabase' is where URLs are stored
+    res.redirect('/urls');
+  });
+  
 //all the api 
   //.get(only for display)
   //.post(to create or update)
