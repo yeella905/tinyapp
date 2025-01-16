@@ -3,6 +3,8 @@ const app = express();
 const PORT = 8080; // default port 8080
 const a = 1;
 
+function generateRandomString() {}
+
 app.set("view engine", "ejs"); //in this server the html rendering engine is going ot be ejs
 //"view engine" is the html viewing engine
 
@@ -65,7 +67,7 @@ app.get("/urls.json", (req, res) => {
     res.send("Ok"); // Respond with 'Ok' (we will replace this)
   });
 
-  
+
 //all the api 
   //.get(only for display)
   //.post(to create or update)
