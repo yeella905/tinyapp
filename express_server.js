@@ -88,6 +88,14 @@ app.get("/urls.json", (req, res) => {
     }
   });
 
+  app.post("/urls", (req, res) => {
+    const longURL = req.body.longURL; // Extract the long URL from the request body
+    const shortID = generateRandomString(6); // Generate a random string for the URL slug
+  
+    urlDatabase[shortID] = longURL; // Store in the database
+  
+    res.redirect(`/urls/${shortID}`); // Redirect to the new URL page
+  });
  
 //all the api 
   //.get(only for display)
