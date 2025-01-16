@@ -67,6 +67,10 @@ app.get("/urls.json", (req, res) => {
     res.send("Ok"); // Respond with 'Ok' (we will replace this)
   });
 
+  app.get("/u/:id", (req, res) => {
+    const longURL = urlDatabase[id]
+    res.redirect(longURL);
+  });
 
 //all the api 
   //.get(only for display)
