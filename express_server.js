@@ -92,6 +92,12 @@ app.get("/urls.json", (req, res) => {
     res.redirect(`/urls/${shortID}`); // Redirect to the new URL page
   });
  
+
+  app.post('/urls/:id/delete', (req, res) => {
+    const id = req.params.id;
+    delete urlDatabase[id]; // Assuming urlDatabase is your database object
+    res.redirect('/urls');
+  });
 //all the api 
   //.get(only for display)
   //.post(to create or update)
