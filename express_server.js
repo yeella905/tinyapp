@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const app = express();
+app.use(cookieParser());
 const PORT = 8080; // default port 8080
 const a = 1;
 
@@ -51,8 +52,11 @@ app.get("/urls.json", (req, res) => {
     res.send(`a = ${a}`);
   });
 
+  //fetching 
   app.get("/urls", (req, res) => {
-    const templateVars = { urls: urlDatabase };
+    const templateVars = { urls: urlDatabase,
+      username: req.cookies.username
+     };
     res.render("urls_index", templateVars);
   });
 
@@ -101,6 +105,11 @@ app.get("/urls.json", (req, res) => {
     res.redirect('/urls');
   });
 
+  app.get('/someRoute', (req, res) => {
+    let username = req.cookies['username']; // Adjust 'username' to your cookie's key
+    res.render('your_template', { username: username });
+  });
+
   app.post('/urls/:id', (req, res) => {
     const shortURL = req.params.id;
     const newLongURL = req.body.longURL; // Ensure 'longURL' matches the form input's name attribute
@@ -125,9 +134,20 @@ app.post('/login', (req, res) => {
     // Redirect the browser back to the /urls page after setting the cookie
     res.redirect('/urls');
 });
+
+//to display the username on display
+app.get("/urls", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"],
+    // ... any other vars
+  };
+  res.render("urls_index", templateVars);
+});
 //all the api 
   //.get(only for display)
   //.post(to create or update)
   //.put(to create or update but mostly for updating)
   //.patch (partial updates, updating existing resources)
   //.delete (to delete)
+
+  //parsing 
