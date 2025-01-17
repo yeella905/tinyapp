@@ -108,9 +108,23 @@ app.get("/urls.json", (req, res) => {
     res.redirect('/urls');
   });
 
+  //cookie section 
 
+  // Middleware to parse incoming form data
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser()); // Make sure you have cookie-parser available
 
-  
+// Example POST route for logging in
+app.post('/login', (req, res) => {
+    // Capture the username from the request body
+    const username = req.body.username;
+
+    // Set a cookie named 'username' with the value submitted in the form
+    res.cookie('username', username);
+
+    // Redirect the browser back to the /urls page after setting the cookie
+    res.redirect('/urls');
+});
 //all the api 
   //.get(only for display)
   //.post(to create or update)
