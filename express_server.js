@@ -1,4 +1,6 @@
 const express = require("express");
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
 const a = 1;
@@ -105,6 +107,9 @@ app.get("/urls.json", (req, res) => {
     urlDatabase[shortURL] = newLongURL; // Assuming 'urlDatabase' is where URLs are stored
     res.redirect('/urls');
   });
+
+
+
   
 //all the api 
   //.get(only for display)
@@ -112,9 +117,3 @@ app.get("/urls.json", (req, res) => {
   //.put(to create or update but mostly for updating)
   //.patch (partial updates, updating existing resources)
   //.delete (to delete)
-
-/**
-*@param {}
-*@param {}
-*@return {}
-*/
