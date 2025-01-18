@@ -21,7 +21,10 @@
       <!-- This is the form for login -->
       <% if (username) { %>
         <p>
-          Logged in as: <%= username %>
+          Logged in as: <%= username %> 
+          <form action="/logout" method="POST" class="form-inline">
+          <button type="submit" class="btn btn-outline-light">Logout</button>
+          </form>
         </p>
         <% } else { %>
           <form action="/login" method="POST" class="form-inline">

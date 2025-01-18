@@ -135,6 +135,15 @@ app.post('/login', (req, res) => {
     res.redirect('/urls');
 });
 
+app.post('/logout', (req, res) => {
+
+  res.clearCookie('username'); // Clear the 'username' cookie
+
+  // Redirect the browser back to the /urls page after setting the cookie
+  res.redirect('/urls');
+});
+
+
 //to display the username on display
 app.get("/urls", (req, res) => {
   const templateVars = {
