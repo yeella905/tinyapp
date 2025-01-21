@@ -67,14 +67,22 @@ app.get("/urls.json", (req, res) => {
   });
 
   app.get("/urls/new", (req, res) => {
-    res.render("urls_new");
+    const username = req.cookies['username'];
+    if (username) {
+      // Pass the username to your EJS template
+      res.render("urls_new", { username });
+    } else {
+      // Redirect or render a different page if no username is found
+      res.redirect('/login'); // Redirecting to a login page, for instance
+    }
   });
-
+  
  app.get("/urls/:id", (req, res) => {
+    const username = req.cookies['username']; // Use quotes for the cookie name
     const id = req.params.id;
     const longURL = urlDatabase[id]; // Retrieve longURL using the short URL ID
 
-    const templateVars = { id, longURL };
+    const templateVars = { id, longURL, username };
     res.render("urls_show", templateVars);
   });
 
