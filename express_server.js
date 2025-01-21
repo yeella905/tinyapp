@@ -4,12 +4,17 @@ const cookieParser = require('cookie-parser');
 const app = express();
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(cookieParser()); // Make sure you have cookie-parser available
 // Placeholder for user data storage
 const users = {};
 const PORT = 8080; // default port 8080
 const a = 1;
 
+app.listen(PORT, () => { //what port the server should run on
+  console.log(`Example app listening on port ${PORT}!`);
+});
+//function to form the short url
 function generateRandomString(length) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let randomString = '';
@@ -29,14 +34,6 @@ const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
-
-app.get("/", (req, res) => {
-  res.send("Hello!");
-}); //app.get (API ROUTES)
-
-app.listen(PORT, () => { //what port the server should run on
-  console.log(`Example app listening on port ${PORT}!`);
-});
 
 app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
@@ -62,11 +59,6 @@ app.get("/urls.json", (req, res) => {
     res.render("urls_index", templateVars);
   });
 
-  app.post("/hello", (req, res) => { //req is when the user goes to /hello //res is when you're
-    const templateVars = { greeting: "Hello World!" , intro: "hi"}; //template variable should match the varible inside the ejs file
-    res.render("hello_world", req.query); //rendering ejs files or showing the outout that's storing in the ejs file. looks for the file in qutation marks.
-  
-  });
 
   app.get("/urls/new", (req, res) => {
     const username = req.cookies['username'];
@@ -99,6 +91,37 @@ app.get("/urls.json", (req, res) => {
     }
   });
 
+  app.get('/someRoute', (req, res) => {
+    let username = req.cookies['username']; // Adjust 'username' to your cookie's key
+    res.render('your_template', { username: username });
+  });
+  
+//to display the username on display
+app.get("/urls", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"],
+    // ... any other vars
+  };
+  res.render("urls_index", templateVars);
+});
+
+
+app.get("/register", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"],
+    // ... any other vars
+  };
+  res.render("register", templateVars);
+});
+
+
+
+  app.post("/hello", (req, res) => { //req is when the user goes to /hello //res is when you're
+    const templateVars = { greeting: "Hello World!" , intro: "hi"}; //template variable should match the varible inside the ejs file
+    res.render("hello_world", req.query); //rendering ejs files or showing the outout that's storing in the ejs file. looks for the file in qutation marks.
+  
+  });
+
   app.post("/urls", (req, res) => {
     const longURL = req.body.longURL; // Extract the long URL from the request body
     const shortID = generateRandomString(6); // Generate a random string for the URL slug
@@ -115,11 +138,7 @@ app.get("/urls.json", (req, res) => {
     res.redirect('/urls');
   });
 
-  app.get('/someRoute', (req, res) => {
-    let username = req.cookies['username']; // Adjust 'username' to your cookie's key
-    res.render('your_template', { username: username });
-  });
-
+  
   app.post('/urls/:id', (req, res) => {
     const shortURL = req.params.id;
     const newLongURL = req.body.longURL; // Ensure 'longURL' matches the form input's name attribute
@@ -128,11 +147,6 @@ app.get("/urls.json", (req, res) => {
   });
 
   //cookie section 
-
-  // Middleware to parse incoming form data
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser()); // Make sure you have cookie-parser available
-
 // Example POST route for logging in
 app.post('/login', (req, res) => {
     // Capture the username from the request body
@@ -151,25 +165,6 @@ app.post('/logout', (req, res) => {
 
   // Redirect the browser back to the /urls page after setting the cookie
   res.redirect('/urls');
-});
-
-
-//to display the username on display
-app.get("/urls", (req, res) => {
-  const templateVars = {
-    username: req.cookies["username"],
-    // ... any other vars
-  };
-  res.render("urls_index", templateVars);
-});
-
-
-app.get("/register", (req, res) => {
-  const templateVars = {
-    username: req.cookies["username"],
-    // ... any other vars
-  };
-  res.render("register", templateVars);
 });
 
 
