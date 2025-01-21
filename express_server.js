@@ -2,7 +2,11 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const app = express();
+// Middleware to parse form data
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+// Placeholder for user data storage
+const users = {};
 const PORT = 8080; // default port 8080
 const a = 1;
 
@@ -160,6 +164,33 @@ app.get("/urls", (req, res) => {
   };
   res.render("urls_index", templateVars);
 });
+
+
+app.get("/register", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"],
+    // ... any other vars
+  };
+  res.render("register", templateVars);
+});
+
+
+app.post("/register", (req,res) => {
+
+  const { email, password } = req.body;
+
+    // Check if the email has already been registered
+  if (users[email]) {
+    return res.status(400).send('Email already registered.');
+  } 
+   // Hash the password and store User (consider using bcrypt for hashing in a real app)
+   users[email] = { email, password };
+
+  res.redirect('/urls');  // Redirect to the URLs page after successful registration
+
+});
+
+
 //all the api 
   //.get(only for display)
   //.post(to create or update)
