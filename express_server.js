@@ -172,17 +172,48 @@ app.post("/register", (req,res) => {
 
   const { email, password } = req.body;
 
-    // Check if the email has already been registered
-  if (users[email]) {
+  let emailExists = false;
+  for (let userId in usersregistered) {
+    if (usersregistered[userId].email === email) {
+      emailExists = true;
+      break;
+    }
+  }
+  
+  if (emailExists) {
     return res.status(400).send('Email already registered.');
-  } 
-   // Hash the password and store User (consider using bcrypt for hashing in a real app)
-   users[email] = { email, password };
+  }
 
   res.redirect('/urls');  // Redirect to the URLs page after successful registration
 
 });
 
+
+function generateRandomid(length) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomid = '';
+  
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomid += characters[randomIndex];
+    
+  }
+
+  return randomid;
+}
+
+const usersregistered = {
+  userRandomID: {
+    id: "user1",
+    email: "user1@example.com",
+    password: "456",
+  },
+  user2RandomID: {
+    id: "user2",
+    email: "user2@example.com",
+    password: "123",
+  },
+};
 
 //all the api 
   //.get(only for display)
