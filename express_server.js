@@ -184,6 +184,19 @@ app.post("/register", (req,res) => {
     return res.status(400).send('Email already registered.');
   }
 
+//1.generate user id from the function gererateRandomid
+const newUserId = generateRandomid(6);
+
+//2. Add the new users to the "userregistered" object
+usersegistered[newUserId] = {
+  id: newUserId,
+  email: email,
+  password: password  //best practice to hass password
+}
+
+  // 3. Set a cookie with the user ID
+  res.cookie("user_id", newUserId);
+
   res.redirect('/urls');  // Redirect to the URLs page after successful registration
 
 });
@@ -201,6 +214,7 @@ function generateRandomid(length) {
 
   return randomid;
 }
+
 
 const usersregistered = {
   userRandomID: {
