@@ -32,10 +32,13 @@
         <tbody>
           <% for (let id in urls) { %>
             <tr>
-              <td><%= id %></td>
-              <td><%= urls[id] %></td>
+              <td>Short URL: <%= id %></td>
+              <td>Long URL: <%= urls[id].longURL %></td>
               <td>
-                <a href="/urls/<%= id %>/edit" class="btn btn-primary">Edit</a>
+                <form method="POST" action="/urls/<%= id %>/edit">
+                  <input type="text" name="longURL" value="<%= urls[id].longURL %>" />
+                  <button type="submit">Update</button>
+                </form>
               </td>
               <td>
                 <form method="POST" action="/urls/<%= id %>/delete">
