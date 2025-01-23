@@ -7,7 +7,7 @@ app.use(express.urlencoded({ extended: true }));
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser()); // Make sure you have cookie-parser available
 // Placeholder for user data storage
-const users = {};
+// const users = {};
 const PORT = 8080; // default port 8080
 const a = 1;
 
@@ -53,18 +53,20 @@ app.get("/urls.json", (req, res) => {
 
   //fetching 
   app.get("/urls", (req, res) => {
-    const templateVars = { urls: urlDatabase,
-      username: req.cookies.username
-     };
+    // Use user_id to find the user in the registered users
+    const userId = req.cookies["user_id"];
+    const user = usersregistered[userId];
+    // Pass the user object to the template
+    const templateVars = { urls: urlDatabase, user };
     res.render("urls_index", templateVars);
   });
 
 
   app.get("/urls/new", (req, res) => {
-    const username = req.cookies['username'];
-    if (username) {
-      // Pass the username to your EJS template
-      res.render("urls_new", { username });
+    const userId = req.cookies["user_id"];
+    const user = usersregistered[userId];
+    if (user) {
+        res.render("urls_new", { user });
     } else {
       // Redirect or render a different page if no username is found
       res.redirect('/login'); // Redirecting to a login page, for instance
@@ -72,13 +74,22 @@ app.get("/urls.json", (req, res) => {
   });
   
  app.get("/urls/:id", (req, res) => {
-    const username = req.cookies['username']; // Use quotes for the cookie name
-    const id = req.params.id;
-    const longURL = urlDatabase[id]; // Retrieve longURL using the short URL ID
+  const userId = req.cookies["user_id"];
+  const user = usersregistered[userId];
+  const id = req.params.id;
+  const longURL = urlDatabase[id]; // Correctly retrieve longURL using the provided id
 
-    const templateVars = { id, longURL, username };
-    res.render("urls_show", templateVars);
+  if (!longURL) {
+    return res.status(404).send('URL not found or does not exist!');
+  }
+
+  // Pass all necessary variables into the template
+
+  const templateVars = { id, longURL, user };
+  console.log('Template Vars:', templateVars);
+  res.render("urls_show", templateVars);
   });
+
 
   app.get("/u/:id", (req, res) => {
     const { id } = req.params;
@@ -98,19 +109,19 @@ app.get("/urls.json", (req, res) => {
   
 //to display the username on display
 app.get("/urls", (req, res) => {
-  const templateVars = {
-    username: req.cookies["username"],
-    // ... any other vars
-  };
+  const userId = req.cookies["user_id"];
+  const user = usersregistered[userId];
+
+  const templateVars = { user };
   res.render("urls_index", templateVars);
 });
 
 
 app.get("/register", (req, res) => {
-  const templateVars = {
-    username: req.cookies["username"],
-    // ... any other vars
-  };
+  const userId = req.cookies["user_id"];
+  const user = usersregistered[userId];
+
+  const templateVars = { user };
   res.render("register", templateVars);
 });
 
@@ -149,22 +160,22 @@ app.get("/register", (req, res) => {
   //cookie section 
 // Example POST route for logging in
 app.post('/login', (req, res) => {
-    // Capture the username from the request body
-    const username = req.body.username;
-
-    // Set a cookie named 'username' with the value submitted in the form
-    res.cookie('username', username);
-
-    // Redirect the browser back to the /urls page after setting the cookie
-    res.redirect('/urls');
+ 
+    const { email, password } = req.body;
+     // Check if the user exists
+    for (const userId in usersregistered) {
+      const user = usersregistered[userId];
+      if (user.email === email && user.password === password) {
+        res.cookie('user_id', userId);  // Set the user_id cookie
+        return res.redirect('/urls');
+      }
+    }
+    res.status(401).send('Login failed');
 });
 
 app.post('/logout', (req, res) => {
-
-  res.clearCookie('username'); // Clear the 'username' cookie
-
-  // Redirect the browser back to the /urls page after setting the cookie
-  res.redirect('/urls');
+  res.clearCookie('user_id'); // Clear the 'username' cookie
+  res.redirect('/urls'); // Redirect the browser back to the /urls page after setting the cookie
 });
 
 // Declare the usersregistered object at a global scope level
@@ -179,12 +190,11 @@ const usersregistered = {
     email: "user2@example.com",
     password: "123",
   },
+  
 };
-
 
 // Registration handler
 app.post("/register", (req,res) => {
-
   const { email, password } = req.body;
 
   let emailExists = false;
@@ -202,16 +212,15 @@ app.post("/register", (req,res) => {
 //1.generate user id from the function gererateRandomid
 const newUserId = generateRandomid(6);
 
-//2. Add the new users to the "userregistered" object
+//2. Add the new users to the "userre"
 usersregistered[newUserId] = {
   id: newUserId,
   email: email,
-  password: password  //best practice to hass password
+  password: password  //best practice to hash password
 }
-
-  // 3. Set a cookie with the user ID
-  res.cookie("user_id", newUserId);
-
+// 3. Set a cookie with the user ID
+res.cookie("user_id", newUserId);
+console.log(usersregistered);
   res.redirect('/urls');  // Redirect to the URLs page after successful registration
 
 });
@@ -229,6 +238,8 @@ function generateRandomid(length) {
 
   return randomid;
 }
+
+
 //test
 //all the api 
   //.get(only for display)
