@@ -167,7 +167,22 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
+// Declare the usersregistered object at a global scope level
+const usersregistered = {
+  userRandomID: {
+    id: "user1",
+    email: "user1@example.com",
+    password: "456",
+  },
+  user2RandomID: {
+    id: "user2",
+    email: "user2@example.com",
+    password: "123",
+  },
+};
 
+
+// Registration handler
 app.post("/register", (req,res) => {
 
   const { email, password } = req.body;
@@ -188,7 +203,7 @@ app.post("/register", (req,res) => {
 const newUserId = generateRandomid(6);
 
 //2. Add the new users to the "userregistered" object
-usersegistered[newUserId] = {
+usersregistered[newUserId] = {
   id: newUserId,
   email: email,
   password: password  //best practice to hass password
@@ -214,21 +229,6 @@ function generateRandomid(length) {
 
   return randomid;
 }
-
-
-const usersregistered = {
-  userRandomID: {
-    id: "user1",
-    email: "user1@example.com",
-    password: "456",
-  },
-  user2RandomID: {
-    id: "user2",
-    email: "user2@example.com",
-    password: "123",
-  },
-};
-
 //test
 //all the api 
   //.get(only for display)
