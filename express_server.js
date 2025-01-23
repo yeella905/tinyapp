@@ -193,21 +193,34 @@ const usersregistered = {
   
 };
 
-// Registration handler
-app.post("/register", (req,res) => {
-  const { email, password } = req.body;
-
-  let emailExists = false;
+//function to get user email
+function getUserByEmail(email) {
   for (let userId in usersregistered) {
     if (usersregistered[userId].email === email) {
-      emailExists = true;
-      break;
-    }
+      return usersregistered[userId]; // Return the user object if found
+    } 
   }
-  
-  if (emailExists) {
+  return null; // Return null if no user is found
+}
+
+// Registration handler
+app.post("/register", (req,res) => {
+
+  const { email, password } = req.body;
+
+  // Check for empty fields
+  if (!email || !password) {
+    return res.status(400).send('Email and password cannot be empty.');
+  }
+
+  // Use the helper function to see if the email already exists
+  const existingUser = getUserByEmail(email);
+
+  if (existingUser) {
     return res.status(400).send('Email already registered.');
+
   }
+
 
 //1.generate user id from the function gererateRandomid
 const newUserId = generateRandomid(6);
