@@ -17,23 +17,21 @@
         <div class="navbar-nav">
           <a class="nav-item nav-link" href="/urls">My URLs</a>
           <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-          <a class="nav-item nav-link" href="/register">register here </a>
-          <a class="nav-item nav-link" href="/login">login </a>
-          </div>
-           <!-- buttom for register-->
         </div>
+        <div class="navbar-nav ml-auto">
+          <% if (!user) { %>
+            <!-- Show these links only if the user is not logged in -->
+            <a class="nav-item nav-link" href="/register">register here </a>
+            <a class="nav-item nav-link" href="/login">login </a>
+          <% } else { %>
+            <!-- Show logged in user info and Logout button -->
+            <p class="nav-item nav-link">Logged in as: <%= user.email %></p>
+            <form action="/logout" method="POST" class="form-inline">
+              <button type="submit" class="btn btn-outline-light">Logout</button>
+            </form>
+          </p>
+        <% }; %>
       </div>
-
- 
-  
-      <!-- This is the form for login -->
-      <% if (user) { %>
-        <p>
-          Logged in as: <%= user.email %> 
-          <form action="/logout" method="POST" class="form-inline">
-          <button type="submit" class="btn btn-outline-light">Logout</button>
-          </form>
-        </p>
-          <% }; %>
-    </nav>
-  </header>
+    </div>
+  </nav>
+</header>
