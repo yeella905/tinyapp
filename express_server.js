@@ -116,8 +116,9 @@ app.get("/urls.json", (req, res) => {
     let username = req.cookies['username']; // Adjust 'username' to your cookie's key
     res.render('your_template', { username: username });
   });
+  
 
-  app.get("/register", (req, res) => {
+app.get("/register", (req, res) => {
   const userId = req.cookies["user_id"];
   const user = usersregistered[userId];
 
@@ -132,6 +133,7 @@ app.get("/login", (req, res) => {
   const templateVars = { user };
   res.render("login", templateVars);
 });
+
 
   app.post("/hello", (req, res) => { //req is when the user goes to /hello //res is when you're
     const templateVars = { greeting: "Hello World!" , intro: "hi"}; //template variable should match the varible inside the ejs file
@@ -195,7 +197,7 @@ app.post('/login', (req, res) => {
       }
     }
   }
-    // Email not found after checking all users
+
     res.status(401).send('Login failed');
 });
 
@@ -247,7 +249,9 @@ app.post("/register", (req,res) => {
 
   if (existingUser) {
     return res.status(400).send('Email already registered.');
+
   }
+
 
 //1.generate user id from the function gererateRandomid
 const newUserId = generateRandomid(6);
@@ -265,6 +269,7 @@ console.log(usersregistered);
 
 });
 
+
 function generateRandomid(length) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let randomid = '';
@@ -272,7 +277,9 @@ function generateRandomid(length) {
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * characters.length);
     randomid += characters[randomIndex];
+    
   }
+
   return randomid;
 }
 
@@ -301,7 +308,7 @@ app.post("/login", (req,res) => {
   // Respond with 403 if the email is not found
   return res.status(403).send('Email not found');
 });
-
+//test
 //all the api 
   //.get(only for display)
   //.post(to create or update)
