@@ -121,7 +121,9 @@ app.get("/urls.json", (req, res) => {
 app.get("/register", (req, res) => {
   const userId = req.cookies["user_id"];
   const user = usersregistered[userId];
-
+  if (user) {
+    res.redirect('/urls');
+  }
   const templateVars = { user };
   res.render("register", templateVars);
 });
@@ -129,7 +131,9 @@ app.get("/register", (req, res) => {
 app.get("/login", (req, res) => {
   const userId = req.cookies["user_id"];
   const user = usersregistered[userId];
-
+  if (user) {
+    res.redirect('/urls');
+  }
   const templateVars = { user };
   res.render("login", templateVars);
 });
@@ -317,3 +321,5 @@ app.post("/login", (req,res) => {
   //.delete (to delete)
 
   //parsing 
+ 
+ 
