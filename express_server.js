@@ -6,7 +6,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser()); // Make sure you have cookie-parser available
-
+ const bcrypt = require("bcryptjs");
 const PORT = 8080; // default port 8080
 const a = 1;
 
@@ -109,7 +109,6 @@ app.get("/urls.json", (req, res) => {
   res.render("urls_show", templateVars);
   });
 
-
   app.get("/u/:id", (req, res) => {
     const { id } = req.params;
     const longURL = urlDatabase[id].longURL; 
@@ -126,7 +125,6 @@ app.get("/urls.json", (req, res) => {
     res.render('your_template', { username: username });
   });
   
-
 app.get("/register", (req, res) => {
   const userId = req.cookies["user_id"];
   const user = usersregistered[userId];
@@ -198,7 +196,7 @@ app.get("/login", (req, res) => {
     }
     // Check if the user is logged in
     if (!userId) {
-      return res.status(404).send('You need to be logged in.');
+      return res.status(403).send('You need to be logged in.');
     }
 
     // Check if the URL belongs to the logged-in user
@@ -224,7 +222,7 @@ app.get("/login", (req, res) => {
     }
     // Check if the user is logged in
     if (!userId) {
-      return res.status(404).send('You need to be logged in.');
+      return res.status(403).send('You need to be logged in.');
     }
 
     // Check if the URL belongs to the logged-in user
@@ -319,26 +317,26 @@ app.post("/register", (req,res) => {
 
   // Use the helper function to see if the email already exists
   const existingUser = getUserByEmail(email);
-
   if (existingUser) {
     return res.status(400).send('Email already registered.');
-
   }
+
+  // Hash the password
+  const hashedPassword = bcrypt.hashSync(password, 10); // adjust as necessary
 
 //1.generate user id from the function gererateRandomid
 const newUserId = generateRandomid(6);
 
-//2. Add the new users to the "userre"
+//2. Add the new users to the "user"
 usersregistered[newUserId] = {
   id: newUserId,
   email: email,
-  password: password  //best practice to hash password
+  password: hashedPassword   //best practice to hash password
 }
 // 3. Set a cookie with the user ID
 res.cookie("user_id", newUserId);
 console.log(usersregistered);
   res.redirect('/urls');  // Redirect to the URLs page after successful registration
-
 });
 
 function generateRandomid(length) {
@@ -387,5 +385,4 @@ app.post("/login", (req,res) => {
   //.delete (to delete)
 
   //parsing 
- 
  
