@@ -245,23 +245,23 @@ app.get("/login", (req, res) => {
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
-     // Check if the user exists
-    for (const userId in usersregistered) {
-      const user = getUserByEmail(email);
+    // Use the getUserByEmail function to find the user
+    const user = getUserByEmail(email);
 
-      if (user.email === email) {
+   // Check if the user was found using the helper function
+  if (user) {
+        // If email exists, compare passwords
         if (user.password === password) {
         // Successful login: Set user_id cookie and redirect
         res.cookie('user_id', userId);  // Set the user_id cookie
         return res.redirect('/urls');
       } else {
         // Email found but password incorrect
-        return res.status(403).send('login failed, password or email not found.');
+        return res.status(403).send('Login failed: Password is incorrect.');
       }
     }
-  }
-
-    res.status(401).send('Login failed');
+    // Email not found
+    return res.status(404).send('Login failed: Email not found.');
 });
 
 app.post('/logout', (req, res) => {
