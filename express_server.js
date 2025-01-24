@@ -249,7 +249,7 @@ app.post('/login', (req, res) => {
    // Check if the user was found using the helper function
   if (user) {
         // If email exists, compare passwords
-        if (user.password === password) {
+        if (bcrypt.compareSync(password, user.password)) {
         // Successful login: Set user_id cookie and redirect
         res.cookie('user_id', userId);  // Set the user_id cookie
         return res.redirect('/urls');
