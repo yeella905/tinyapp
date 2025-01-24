@@ -95,15 +95,14 @@ app.get("/urls.json", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id].longURL; // Correctly retrieve longURL using the provided id
 
-  if (!longURL) {
-    return res.status(404).send('URL not found or does not exist!');
-  }
-
   if (!user) {
     // If no user is logged in
     return res.status(403).send('You need to be logged in to view URLs.');
   }
 
+  if (!longURL) {
+    return res.status(404).send('URL not found or does not exist!');
+  }
 
   // Pass all necessary variables into the template
   const templateVars = { id, longURL, user };
@@ -169,7 +168,7 @@ app.get("/login", (req, res) => {
   app.post('/urls/:id/delete', (req, res) => {
     const userId = req.cookies["user_id"];
     const id = req.params.id;
-    
+
     //checks for if ID exist
     if (!urlDatabase[id]) {
       return res.status(404).send('ID does not exist.');
@@ -236,7 +235,7 @@ app.post('/login', (req, res) => {
 
      // Check if the user exists
     for (const userId in usersregistered) {
-      const user = usersregistered[userId];
+      const user = getUserByEmail(email);
 
       if (user.email === email) {
         if (user.password === password) {
@@ -306,9 +305,6 @@ app.post("/register", (req,res) => {
     return res.status(400).send('Email and password cannot be empty.');
   }
 
-  if (password) {
-    console.log("***");
-  }
   // Use the helper function to see if the email already exists
   const existingUser = getUserByEmail(email);
 
