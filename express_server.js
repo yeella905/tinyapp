@@ -6,8 +6,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser()); // Make sure you have cookie-parser available
-// Placeholder for user data storage
-// const users = {};
+
 const PORT = 8080; // default port 8080
 const a = 1;
 
@@ -148,7 +147,6 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 });
 
-
   app.post("/hello", (req, res) => { //req is when the user goes to /hello //res is when you're
     const templateVars = { greeting: "Hello World!" , intro: "hi"}; //template variable should match the varible inside the ejs file
     res.render("hello_world", req.query); //rendering ejs files or showing the outout that's storing in the ejs file. looks for the file in qutation marks.
@@ -163,7 +161,6 @@ app.get("/login", (req, res) => {
   
     res.redirect(`/urls/${shortID}`); // Redirect to the new URL page
   });
- 
 
   app.post('/urls/:id/delete', (req, res) => {
     const userId = req.cookies["user_id"];
@@ -216,10 +213,25 @@ app.get("/login", (req, res) => {
   });
 
   app.post("/urls/:id/edit", (req, res) => {
+    const userId = req.cookies["user_id"];
     console.log(req.body); // Log the entire body object
     const shortURL = req.params.id;
     const newLongURL = req.body.longURL;
   
+    // Check if the URL ID exists in the database
+    if (!urlDatabase[shortURL]) {
+     return res.status(404).send('URL not found.');
+    }
+    // Check if the user is logged in
+    if (!userId) {
+      return res.status(404).send('You need to be logged in.');
+    }
+
+    // Check if the URL belongs to the logged-in user
+    if (urlDatabase[shortURL].userID !== userId) {
+      return res.status(403).send('You do not have permission to edit this URL.');
+    } 
+
    // Update the URL object
    if (urlDatabase[shortURL]) { // Optional: check if shortURL exists
     urlDatabase[shortURL].longURL = newLongURL; // Update the longURL only
@@ -313,7 +325,6 @@ app.post("/register", (req,res) => {
 
   }
 
-
 //1.generate user id from the function gererateRandomid
 const newUserId = generateRandomid(6);
 
@@ -330,7 +341,6 @@ console.log(usersregistered);
 
 });
 
-
 function generateRandomid(length) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let randomid = '';
@@ -340,9 +350,8 @@ function generateRandomid(length) {
     randomid += characters[randomIndex];
     
   }
-
   return randomid;
-}
+};
 
 app.post("/login", (req,res) => {
   const { email, password } = req.body;
@@ -364,7 +373,7 @@ app.post("/login", (req,res) => {
         return res.status(403).send('Password does not match');
       }
     }
-  }
+  };
 
   // Respond with 403 if the email is not found
   return res.status(403).send('Email not found');
