@@ -31,9 +31,15 @@ app.set("view engine", "ejs"); //in this server the html rendering engine is goi
 //"view engine" is the html viewing engine
 
 const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "user1ID" },
-  "9sm5xK": { longURL: "http://www.google.com", userID: "user2ID" }
+  "b2xVn2": { 
+    longURL: "http://www.lighthouselabs.ca", 
+    userID: "user1ID" 
+  },
+  "9sm5xK": { 
+    longURL: "http://www.google.com", 
+    userID: "user2ID" }
 };
+
 
 app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
@@ -87,14 +93,19 @@ app.get("/urls.json", (req, res) => {
   const userId = req.cookies["user_id"];
   const user = usersregistered[userId];
   const id = req.params.id;
-  const longURL = urlDatabase[id]; // Correctly retrieve longURL using the provided id
+  const longURL = urlDatabase[id].longURL; // Correctly retrieve longURL using the provided id
 
   if (!longURL) {
     return res.status(404).send('URL not found or does not exist!');
   }
 
-  // Pass all necessary variables into the template
+  if (!user) {
+    // If no user is logged in
+    return res.status(403).send('You need to be logged in to view URLs.');
+  }
 
+
+  // Pass all necessary variables into the template
   const templateVars = { id, longURL, user };
   console.log('Template Vars:', templateVars);
   res.render("urls_show", templateVars);
@@ -103,7 +114,7 @@ app.get("/urls.json", (req, res) => {
 
   app.get("/u/:id", (req, res) => {
     const { id } = req.params;
-    const longURL = urlDatabase[id]; // Assuming urlDatabase is your database object
+    const longURL = urlDatabase[id].longURL; 
   
     if (longURL) {
       res.redirect(longURL);
@@ -156,15 +167,52 @@ app.get("/login", (req, res) => {
  
 
   app.post('/urls/:id/delete', (req, res) => {
+    const userId = req.cookies["user_id"];
     const id = req.params.id;
-    delete urlDatabase[id]; // Assuming urlDatabase is your database object
+    
+    //checks for if ID exist
+    if (!urlDatabase[id]) {
+      return res.status(404).send('ID does not exist.');
+    }
+
+    // Check if the user is logged in
+    if (!userId) {
+      return res.status(404).send('You need to be logged in.');
+    }
+
+    // Check if the URL belongs to the logged-in user
+    if (urlDatabase[shortURL].userID !== userId) {
+      return res.status(403).send('You do not have permission to edit this URL.');
+    } 
+
+    // Delete the URL if all checks pass
+    delete urlDatabase[id];
     res.redirect('/urls');
   });
 
   app.post('/urls/:id', (req, res) => {
+    const userId = req.cookies["user_id"];
     const shortURL = req.params.id;
     const newLongURL = req.body.longURL; // Ensure 'longURL' matches the form input's name attribute
     urlDatabase[shortURL] = { longURL: newLongURL, userID: req.cookies["user_id"] }; // Assuming 'urlDatabase' is where URLs are stored
+
+    // Check if the URL ID exists in the database
+    if (!urlDatabase[shortURL]) {
+     return res.status(404).send('URL not found.');
+    }
+    // Check if the user is logged in
+    if (!userId) {
+      return res.status(404).send('You need to be logged in.');
+    }
+
+    // Check if the URL belongs to the logged-in user
+    if (urlDatabase[shortURL].userID !== userId) {
+      return res.status(403).send('You do not have permission to edit this URL.');
+    } 
+
+    // Update the URL if all checks pass
+    urlDatabase[shortURL].longURL = newLongURL;
+
     res.redirect('/urls');
   });
 
@@ -224,6 +272,19 @@ const usersregistered = {
   },
   
 };
+
+//function to return urls that were UserID is equal to the Id of current user
+function urlsForUser(id) { //id represents the current login user
+  const userUrls = {};
+
+  for (let urlId in urlDatabase) {
+    if (urlDatabase[urlId].userID === id) {
+      userUrls[urlId] = urlDatabase[urlId];
+    }
+  }
+  return userUrls;
+}
+
 
 //function to get user email
 function getUserByEmail(email) {
