@@ -1,17 +1,28 @@
+const cookieSession = require('cookie-session')
 const express = require("express");
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
 const app = express();
 // Middleware to parse form data
-  app.use(express.urlencoded({ extended: true }));
-  app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(cookieParser()); // Make sure you have cookie-parser available
+app.use(express.urlencoded({ extended: true }));
+
 const bcrypt = require("bcryptjs");
 const PORT = 8080; // default port 8080
+
+
+//for cookie-session
+app.set('trust proxy', 1) // trust first proxy
+//for cookie-session
+app.use(cookieSession({
+  name: 'session',
+  keys: ['your-secret-key1', 'your-secret-key2'],
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 
 app.listen(PORT, () => { //what port the server should run on
   console.log(`Example app listening on port ${PORT}!`);
 });
+
 //function to form the short url
 function generateRandomString(length) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -24,20 +35,6 @@ function generateRandomString(length) {
   
   return randomString;
 }
-
-// Declare the usersregistered object at a global scope level
-const usersregistered = {
-  userRandomID: {
-    id: "user1",
-    email: "user1@example.com",
-    password: "456",
-  },
-  user2RandomID: {
-    id: "user2",
-    email: "user2@example.com",
-    password: "123",
-  },
-};
 
 //function to return urls that were UserID is equal to the Id of current user
 function urlsForUser(id) { //id represents the current login user
@@ -62,7 +59,7 @@ function getUserByEmail(email) {
   return null; // Return null if no user is found
 }
 
-//to gereate an id for new users
+//function to gereate an id for new users
 function generateRandomid(length) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let randomid = '';
@@ -73,6 +70,20 @@ function generateRandomid(length) {
     
   }
   return randomid;
+};
+
+// Declare the usersregistered object at a global scope level
+const usersregistered = {
+  userRandomID: {
+    id: "user1",
+    email: "user1@example.com",
+    password: "456",
+  },
+  user2RandomID: {
+    id: "user2",
+    email: "user2@example.com",
+    password: "123",
+  },
 };
 
 app.set("view engine", "ejs"); //in this server the html rendering engine is going ot be ejs
@@ -96,10 +107,11 @@ app.get("/urls.json", (req, res) => {
     res.send("<html><body>Hello <b>World</b></body></html>\n");
   });
 
+
   //fetching 
   app.get("/urls", (req, res) => {
     // Use user_id to find the user in the registered users
-    const userId = req.cookies["user_id"];
+    const userId = req.session.user_id; // Use req.session to get the user_id
     const user = usersregistered[userId];
 
     
@@ -122,7 +134,7 @@ app.get("/urls.json", (req, res) => {
   });
 
   app.get("/urls/new", (req, res) => {
-    const userId = req.cookies["user_id"];
+    const userId = req.session.user_id; // Use req.session to get the user_id
     const user = usersregistered[userId];
     if (user) {
         res.render("urls_new", { user });
@@ -133,7 +145,7 @@ app.get("/urls.json", (req, res) => {
   });
   
  app.get("/urls/:id", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.user_id; // Use req.session to get the user_id
   const user = usersregistered[userId];
   const id = req.params.id;
   const longURL = urlDatabase[id].longURL; // Correctly retrieve longURL using the provided id
@@ -170,7 +182,7 @@ app.get("/urls.json", (req, res) => {
   });
   
 app.get("/register", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.user_id; // Use req.session to get the user_id
   const user = usersregistered[userId];
 
   // Log user and cookie status
@@ -186,7 +198,7 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.user_id; // Use req.session to get the user_id
   const user = usersregistered[userId];
 
    // Log user and cookie status
@@ -211,13 +223,13 @@ app.get("/login", (req, res) => {
     const longURL = req.body.longURL; // Extract the long URL from the request body
     const shortID = generateRandomString(6); // Generate a random string for the URL slug
   
-    urlDatabase[shortID] = { longURL: longURL, userID: req.cookies["user_id"] }; // Store in the database
+    urlDatabase[shortID] = { longURL: longURL, userID: req.session.user_id }; // Store in the database
   
     res.redirect(`/urls/${shortID}`); // Redirect to the new URL page
   });
 
   app.post('/urls/:id/delete', (req, res) => {
-    const userId = req.cookies["user_id"];
+    const userId = req.session.user_id; // Use req.session to get the user_id
     const id = req.params.id;
 
     //checks for if ID exist
@@ -241,10 +253,10 @@ app.get("/login", (req, res) => {
   });
 
   app.post('/urls/:id', (req, res) => {
-    const userId = req.cookies["user_id"];
+    const userId = req.session.user_id; // Use req.session to get the user_id
     const shortURL = req.params.id;
     const newLongURL = req.body.longURL; // Ensure 'longURL' matches the form input's name attribute
-    urlDatabase[shortURL] = { longURL: newLongURL, userID: req.cookies["user_id"] }; // Assuming 'urlDatabase' is where URLs are stored
+    urlDatabase[shortURL] = { longURL: newLongURL, userID: req.session.user_id }; // Assuming 'urlDatabase' is where URLs are stored
 
     // Check if the URL ID exists in the database
     if (!urlDatabase[shortURL]) {
@@ -267,7 +279,7 @@ app.get("/login", (req, res) => {
   });
 
   app.post("/urls/:id/edit", (req, res) => {
-    const userId = req.cookies["user_id"];
+    const userId = req.session.user_id; // Use req.session to get the user_id
     console.log(req.body); // Log the entire body object
     const shortURL = req.params.id;
     const newLongURL = req.body.longURL;
@@ -331,17 +343,15 @@ usersregistered[newUserId] = {
   password: hashedPassword   //best practice to hash password
 }
 // 3. Set a cookie with the user ID
-res.cookie("user_id", newUserId);
+req.session.user_id = newUserId;
 console.log(usersregistered);
   res.redirect('/urls');  // Redirect to the URLs page after successful registration
 });
-
 
 // Manually hash passwords for existing users in development
 usersregistered['userRandomID'].password = bcrypt.hashSync('456', 10);
 usersregistered['user2RandomID'].password = bcrypt.hashSync('123', 10);
 
- //cookie section 
 // Example POST route for logging in
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
@@ -356,27 +366,30 @@ app.post('/login', (req, res) => {
     console.log('Found user:', user);
 
  // Check if the user was found using the helper function
-if (user) {
+    if (user) {
   
     // Log password comparison attempt
-    console.log('Comparing password for user:', user.email);
-    // If email exists, compare passwords
-    if (bcrypt.compareSync(password, user.password)) {
-     // Find the correct key in the usersregistered object
-     const userIdKey = Object.keys(usersregistered).find(key => usersregistered[key].email === email);
-     if (userIdKey) {
-       res.cookie('user_id', userIdKey); // Set the user_id cookie as the key
-       console.log('Login successful for user:', user.email);
-       return res.redirect('/urls');
-     } else {
-       console.log('Login failed: UserID key not found.');
-       return res.status(500).send('Login failed: Internal error.');
-     }
+      console.log('Comparing password for user:', user.email);
+
+      // If email exists, compare passwords
+      if (bcrypt.compareSync(password, user.password)) {
+        // Find the correct key in the usersregistered object
+        const userIdKey = Object.keys(usersregistered).find(key => usersregistered[key].email === email);
+
+        if (userIdKey) {
+        req.session.user_id = userIdKey; // Correct assignment to use userIdKey
+        console.log('Login successful for user:', user.email);
+        return res.redirect('/urls');
+      } else {
+        console.log('Login failed: UserID key not found.');
+        return res.status(500).send('Login failed: Internal error.');
+      }
    } else {
      console.log('Login failed: Incorrect password for user:', user.email);
      return res.status(403).send('Login failed: Password is incorrect.');
    }
  }
+
  console.log('Login failed: Email not found.');
  return res.status(403).send('Login failed: Email not found.');
 });
