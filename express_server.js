@@ -8,7 +8,6 @@ app.use(express.urlencoded({ extended: true }));
 const bcrypt = require("bcryptjs");
 const PORT = 8080; // default port 8080
 
-
 //for cookie-session
 app.set('trust proxy', 1) // trust first proxy
 //for cookie-session
@@ -307,7 +306,7 @@ app.get("/login", (req, res) => {
   });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id'); // Clear the 'user_id' cookie
+  req.session.user_id = null; // Clear the user_id from the session
   res.redirect('/urls'); // Redirect the browser back to the /urls page after setting the cookie
 });
 
