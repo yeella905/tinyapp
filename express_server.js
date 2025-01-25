@@ -47,17 +47,6 @@ function urlsForUser(id) { //id represents the current login user
   return userUrls;
 }
 
-//function to get user email
-function getUserByEmail(email) {
-  for (let userKey in usersregistered) {
-    const user = usersregistered[userKey];
-    if (user.email === email) {
-    return user;
-    } 
-  }
-  return null; // Return null if no user is found
-}
-
 //function to gereate an id for new users
 function generateRandomid(length) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -70,6 +59,17 @@ function generateRandomid(length) {
   }
   return randomid;
 };
+
+//function to get user email
+function getUserByEmail(email) {
+  for (let userKey in usersregistered) {
+    const user = usersregistered[userKey];
+    if (user.email === email) {
+    return user;
+    } 
+  }
+  return null; // Return null if no user is found
+}
 
 // Declare the usersregistered object at a global scope level
 const usersregistered = {
@@ -242,7 +242,7 @@ app.get("/login", (req, res) => {
     }
 
     // Check if the URL belongs to the logged-in user
-    if (urlDatabase[shortURL].userID !== userId) {
+    if (urlDatabase[id].userID !== userId) {
       return res.status(403).send('You do not have permission to edit this URL.');
     } 
 
