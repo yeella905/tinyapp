@@ -346,9 +346,4 @@ app.post('/login', (req, res) => {
  return res.status(403).send('Login failed: Email not found.');
 });
 
-  //.get(only for display)
-  //.post(to create or update)
-  //.put(to create or update but mostly for updating)
-  //.patch (partial updates, updating existing resources)
-  //.delete (to delete)
 console.log("Current usersregistered:", usersregistered);
