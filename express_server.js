@@ -21,17 +21,7 @@ app.listen(PORT, () => { //what port the server should run on
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-//getUserByEmail function
-const { getUserByEmail } = require('./helpers.js');
-
-//function to form the short url
-const { generateRandomString } = require('./helpers.js');
-
-//function to return urls that were UserID is equal to the Id of current user
-const { urlsForUser } = require('./helpers.js');
-
-//function to generate an id for new users
-const { generateRandomid } = require('./helpers.js');
+const { getUserByEmail, generateRandomString, urlsForUser, generateRandomid } = require('./helpers.js');
 
 // Declare the usersregistered object at a global scope level
 const usersregistered = {
@@ -74,14 +64,15 @@ app.get("/urls.json", (req, res) => {
     // Use user_id to find the user in the registered users
     const userId = req.session.user_id; // Use req.session to get the user_id
     const user = usersregistered[userId];
-
     
   console.log("Viewing URLs - User ID from cookie: ", userId);
+  
   console.log("Viewing URLs - User found: ", user);
     if (user) {
-        console.log(urlDatabase); // Log to check if data is as expected
+        console.log("Current URL Database:", urlDatabase); // Log to check if data is as expected
     // Fetch URLs for the logged-in userid
-    const userUrls = urlsForUser(userId);
+    const userUrls = urlsForUser(userId, urlDatabase); // Corrected to pass both arguments
+    
     const templateVars = { 
       urls: userUrls,  // Only the URLs belonging to the logged-in user
       user: user
