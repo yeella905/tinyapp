@@ -32,27 +32,15 @@ const urlsForUser = (id, urlDatabase) => { //id represents the current login use
     return userUrls;
 };
 
-
-  //function to gereate an id for new users
-const generateRandomid = (email, database) => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let randomid = '';
-    
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      randomid += characters[randomIndex];
-      
-    }
-    return randomid;
-  };
-
+// Function to generate an ID for new users (aliasing generateRandomString)
+const generateRandomid = (length) => generateRandomString(length);
 
   // Export all functions at once
   module.exports = {
     getUserByEmail,
     generateRandomString,
     urlsForUser,
-    generateRandomId
+    generateRandomid
   };
 
 // //function to get user email
