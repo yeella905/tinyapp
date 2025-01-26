@@ -1,6 +1,5 @@
 const cookieSession = require('cookie-session')
 const express = require("express");
-const bodyParser = require('body-parser');
 const app = express();
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
@@ -22,54 +21,17 @@ app.listen(PORT, () => { //what port the server should run on
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+//getUserByEmail function
+const { getUserByEmail } = require('./helpers.js');
+
 //function to form the short url
-function generateRandomString(length) {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomString = '';
-  
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    randomString += characters[randomIndex];
-  }
-  
-  return randomString;
-}
+const { generateRandomString } = require('./helpers.js');
 
 //function to return urls that were UserID is equal to the Id of current user
-function urlsForUser(id) { //id represents the current login user
-  const userUrls = {};
+const { urlsForUser } = require('./helpers.js');
 
-  for (let urlId in urlDatabase) {
-    if (urlDatabase[urlId].userID === id) {
-      userUrls[urlId] = urlDatabase[urlId];
-    }
-  }
-  return userUrls;
-}
-
-//function to gereate an id for new users
-function generateRandomid(length) {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomid = '';
-  
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    randomid += characters[randomIndex];
-    
-  }
-  return randomid;
-};
-
-//function to get user email
-function getUserByEmail(email) {
-  for (let userKey in usersregistered) {
-    const user = usersregistered[userKey];
-    if (user.email === email) {
-    return user;
-    } 
-  }
-  return null; // Return null if no user is found
-}
+//function to generate an id for new users
+const { generateRandomid } = require('./helpers.js');
 
 // Declare the usersregistered object at a global scope level
 const usersregistered = {
